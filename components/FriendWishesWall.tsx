@@ -2,14 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { Heart, Sparkle, X, EnvelopeOpen, Microphone, Play, Pause } from "@phosphor-icons/react";
+import { Heart, Sparkle, X, EnvelopeOpen } from "@phosphor-icons/react";
 import { celebrationConfig, FriendWish } from "@/config/celebration.config";
-import { useCelebration } from "./CelebrationContext";
 
 export function FriendWishesWall() {
   const [selectedWish, setSelectedWish] = useState<FriendWish | null>(null);
-  const { playJukeboxTrack, currentJukeboxTrackId, activeAudioSource, setActiveAudioSource } =
-    useCelebration();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -22,37 +19,6 @@ export function FriendWishesWall() {
   }, []);
 
   const wishes = celebrationConfig.friendWishes;
-  const isJukeboxPlaying = activeAudioSource === "jukebox";
-
-  const isWishAudioPlaying = (wish: FriendWish) => {
-    if (!wish.audioUrl || !isJukeboxPlaying) return false;
-    return (
-      currentJukeboxTrackId === wish.id ||
-      currentJukeboxTrackId === wish.audioUrl ||
-      (currentJukeboxTrackId === "memo-1" && wish.sender === "Hayati") ||
-      (currentJukeboxTrackId === "memo-3" && wish.sender === "Glamira") ||
-      (currentJukeboxTrackId === "memo-5" && wish.sender === "Spate")
-    );
-  };
-
-  const toggleWishAudio = (wish: FriendWish, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    if (!wish.audioUrl) return;
-
-    if (isWishAudioPlaying(wish)) {
-      setActiveAudioSource("none");
-    } else {
-      const trackId =
-        wish.sender === "Hayati"
-          ? "memo-1"
-          : wish.sender === "Glamira"
-          ? "memo-3"
-          : wish.sender === "Spate"
-          ? "memo-5"
-          : wish.audioUrl;
-      playJukeboxTrack(trackId);
-    }
-  };
 
   return (
     <section className="w-full flex flex-col gap-6">
@@ -180,48 +146,6 @@ export function FriendWishesWall() {
               </button>
             </div>
 
-            {/* Modal Voice Note Banner if friend has real audio */}
-            {selectedWish.audioUrl && (
-              <div className="w-full flex items-center justify-between p-3 rounded-2xl bg-gradient-to-r from-pink-100/90 via-[#fff0f5] to-rose-100/90 border border-pink-300/80 shadow-xs">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shadow-xs flex-shrink-0 ${
-                      isWishAudioPlaying(selectedWish)
-                        ? "bg-gradient-to-tr from-pink-600 to-rose-500 text-white animate-spin"
-                        : "bg-gradient-to-tr from-pink-500 to-rose-400 text-white"
-                    }`}
-                  >
-                    <Microphone size={15} weight="fill" />
-                  </div>
-                  <div className="truncate">
-                    <p className="text-xs font-bold text-[#831843] truncate">
-                      Listen to {selectedWish.sender}&apos;s Real Voice Note
-                    </p>
-                    <p className="text-[10px] text-[#9d174d] truncate font-medium">
-                      Duration: {selectedWish.audioDuration} • Tap to hear the recorded voice message
-                    </p>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => toggleWishAudio(selectedWish)}
-                  className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-transform hover:scale-105 active:scale-95 cursor-pointer flex-shrink-0"
-                >
-                  {isWishAudioPlaying(selectedWish) ? (
-                    <>
-                      <Pause size={13} weight="bold" />
-                      <span>Pause</span>
-                    </>
-                  ) : (
-                    <>
-                      <Play size={13} weight="fill" />
-                      <span>Play ({selectedWish.audioDuration})</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
-
             {/* Modal Image - Proportionally Fitted So 100% of Text is Visible On Screen */}
             <div className="w-full flex items-center justify-center rounded-2xl overflow-hidden border border-pink-200 shadow-md bg-[#1e2c25] p-2">
               <Image
@@ -231,7 +155,7 @@ export function FriendWishesWall() {
                 height={selectedWish.height}
                 unoptimized
                 priority
-                className="max-h-[66vh] max-w-full w-auto h-auto object-contain rounded-xl block select-none mx-auto"
+                className="max-h-[72vh] max-w-full w-auto h-auto object-contain rounded-xl block select-none mx-auto"
               />
             </div>
 
