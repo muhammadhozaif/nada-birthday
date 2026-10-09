@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Heart, Sparkle, X, EnvelopeOpen, Microphone, Play, Pause } from "@phosphor-icons/react";
 import { celebrationConfig, FriendWish } from "@/config/celebration.config";
@@ -10,6 +10,16 @@ export function FriendWishesWall() {
   const [selectedWish, setSelectedWish] = useState<FriendWish | null>(null);
   const { playJukeboxTrack, currentJukeboxTrackId, activeAudioSource, setActiveAudioSource } =
     useCelebration();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedWish(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const wishes = celebrationConfig.friendWishes;
   const isJukeboxPlaying = activeAudioSource === "jukebox";
@@ -119,34 +129,17 @@ export function FriendWishesWall() {
               </div>
             </div>
 
-            {/* Card Action Hint & Voice Note Button */}
-            <div className="pt-2.5 border-t border-pink-100/90 flex items-center justify-between text-xs font-bold text-pink-600">
-              <span className="flex items-center gap-1.5 min-w-0 truncate">
-                <Heart size={14} weight="fill" className="text-pink-500 flex-shrink-0" />
-                <span className="truncate">Wish From {wish.sender}</span>
+            {/* Card Action Hint */}
+            <div className="pt-2 border-t border-pink-100/80 flex items-center justify-between text-xs font-bold text-pink-600 group-hover:text-pink-700">
+              <span className="flex items-center gap-1.5">
+                <Heart size={14} weight="fill" className="text-pink-500" />
+                <span>Wish From {wish.sender}</span>
               </span>
-
-              {wish.audioUrl ? (
-                <button
-                  onClick={(e) => toggleWishAudio(wish, e)}
-                  aria-label={`Play voice note from ${wish.sender}`}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-2xs flex-shrink-0 ${
-                    isWishAudioPlaying(wish)
-                      ? "bg-pink-600 text-white border-pink-600 animate-pulse"
-                      : "bg-pink-100 hover:bg-pink-200 text-[#831843] border-pink-200/90"
-                  }`}
-                >
-                  <Microphone size={12} weight="fill" />
-                  <span>{isWishAudioPlaying(wish) ? "Playing" : "Voice Note"}</span>
-                  <span className="font-mono text-[10px] opacity-80">{wish.audioDuration}</span>
-                </button>
-              ) : (
-                <Sparkle
-                  size={14}
-                  weight="fill"
-                  className="text-pink-400 group-hover:rotate-45 transition-transform flex-shrink-0"
-                />
-              )}
+              <Sparkle
+                size={14}
+                weight="fill"
+                className="text-pink-400 group-hover:rotate-45 transition-transform"
+              />
             </div>
           </div>
         ))}
